@@ -14,6 +14,9 @@
         body {
             height: 100%;
         }
+        #aui-header{
+            background-color: #ffc15e;
+        }
 
         .wrap {
             display: -webkit-box;
@@ -34,7 +37,9 @@
 </head>
 
 <body class="wrap">
-    <header id="header-title" class="aui-bar aui-bar-nav">罗同学的导航栏</header>
+    <header id="aui-header" class="aui-bar aui-bar-nav">
+        <span id="header-title">罗同学</span>
+    </header>
     <section class="flex-1">
 
     </section>
@@ -43,10 +48,12 @@
             <span class="fa fa-home fa-2x"></span><p>首页</p></li>
         <li id="tabbar2" onclick="randomSwitchBtn(this,'视频',1)">
             <span class="fa fa-play-circle-o fa-2x"></span><p>视频</p></li>
+        <li id="tabbar5" onclick="randomSwitchBtn(this,'聊一聊',4)">
+                <span class="fa fa-weixin fa-2x"></span><p>微聊</p></li>
         <li id="tabbar3" onclick="randomSwitchBtn(this,'动态',2)">
             <span class="fa fa-music fa-2x"></span><p>动态</p></li>
-        <li id="tabbar4" onclick="randomSwitchBtn(this,'关于',3)">
-            <span class="fa fa-user-circle fa-2x"></span><p>关于</p></li>
+        <li id="tabbar4" onclick="randomSwitchBtn(this,'个人中心',3)">
+            <span class="fa fa-user-circle fa-2x"></span><p>我的</p></li>
     </ul></footer>
 </body>
 <script type="text/javascript" src="./script/api.js"></script>
@@ -69,35 +76,45 @@
         var body_h = $api.offset($api.dom('body')).h;
         var footer_h = $api.offset($api.byId('aui-footer')).h;
         api.openFrameGroup({
-            name: 'foot_demo',
-            scrollEnabled: false,
+            name: 'footer_frame',
+            // 是否允许左右滑动
+            scrollEnabled: true,
             rect: {
                 x:0,
                 y:headerPos.h,
                 w:'auto',
                 h:body_h - headerPos.h - footer_h
             },
+            // 默认index从0开始
             index: 0,
             // 预载
             preload:3,
             frames: [{
-                name: 'foot_tab_1', 
-                url: 'foot_tab_1.html',
-                bounces:false,
+                name: 'frame_hot', 
+                url: 'html/frame_hot.html',
+                bounces:true,
             },{
-                name: 'foot_tab_2', 
+                name: 'frame_video', 
                 bounces:false,
-                url: 'foot_tab_2.html',
-            },{
-                bounces:false,
-                name: 'foot_tab_3',
-                url: 'foot_tab_3.html'
+                url: 'html/frame_video.html',
             },{
                 bounces:false,
-                name: 'foot_tab_4', 
-                url: 'foot_tab_4.html'
+                name: 'frame_music',
+                url: 'html/frame_music.html'
+            },{
+                bounces:false,
+                name: 'frame_user', 
+                url: 'html/frame_user.html'
+            },{
+                bounces:false,
+                name: 'main', 
+                url: 'html/main.html'
             }]
         }, function(ret, err){
+            // 滑动切换底部导航
+            var footer = $api.byId('aui-footer');
+            var footerAct = $api.dom(footer, '.aui-bar-tab li.active-warning');
+            $api.removeCls(footerAct, 'active-warning');
             var name  = ret.name;
             var index = ret.index;
             if(index == 0){
@@ -110,26 +127,34 @@
                 $api.text($api.byId('header-title'),'动态');
                 $api.addCls($api.byId('tabbar3'), 'active-warning'); 
             }else if(index == 3){
-                $api.text($api.byId('header-title'),'关于');
+                $api.text($api.byId('header-title'),'个人中心');
                 $api.addCls($api.byId('tabbar4'), 'active-warning'); 
+            }else if(index == 4){
+                $api.text($api.byId('header-title'),'聊一聊');
+                $api.addCls($api.byId('tabbar5'), 'active-warning'); 
             }
         });
         $api.addEvt($api.byId('back'), 'click', function(){
             api.closeWin();
         });
     };
-        function randomSwitchBtn(obj,name,index){
-            $api.text($api.byId('header-title'), name);
-            var footer = $api.byId('aui-footer');
-            var footerAct = $api.dom(footer, '.aui-bar-tab li.active-warning');
-            $api.removeCls(footerAct, 'active-warning');
-            $api.addCls(obj, 'active-warning');
-            api.setFrameGroupIndex({
-                name: 'footer_tab_demo',
-                index: index,
-                scroll: true
-            });
-        }
+    // 点击切换底部栏导航
+    function randomSwitchBtn(obj,name,index){
+        $api.text($api.byId('header-title'), name);
+        var footer = $api.byId('aui-footer');
+        var footerAct = $api.dom(footer, '.aui-bar-tab li.active-warning');
+        $api.removeCls(footerAct, 'active-warning');
+        $api.addCls(obj, 'active-warning');
+        // 设置frame组当前可见的frame
+        api.setFrameGroupIndex({
+            // frame组的名称
+            name: 'footer_frame',
+            // 可见子级frame的索引值
+            index: index,
+            // 是否平滑滚动至目标窗口
+            scroll: true
+        });
+    }
 </script>
 
 </html>
